@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { ConnectToDB } from "./config/db.js";
+import authRouter from "./routes/authRoutes.js";
 dotenv.config();
+
 
 const app = express();
 
@@ -17,6 +19,8 @@ app.get("/health", (req, res) => {
     message: "Server is running",
   });
 });
+
+app.use('/api', authRouter);
 
 ConnectToDB();
 app.listen(PORT, () => {
