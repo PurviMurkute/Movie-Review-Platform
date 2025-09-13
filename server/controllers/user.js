@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import bcrypt, { genSalt } from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
+import Review from "../models/Review.js";
+import { getCache, createCache, flushCache } from "../utils/cache.js";
 
 const postSignUp = async (req, res) => {
   const { username, email, password, profile, joinDate } = req.body;
@@ -49,7 +51,7 @@ const postSignUp = async (req, res) => {
     email,
     password: encryptedPassword,
     profile,
-    joinDate
+    joinDate,
   });
 
   try {
@@ -100,7 +102,7 @@ const postLogin = async (req, res) => {
     });
   }
 
-  user.password = undefined; 
+  user.password = undefined;
 
   const jwtToken = jwt.sign(
     {
@@ -120,5 +122,84 @@ const postLogin = async (req, res) => {
   });
 };
 
+const getUserbyId = async (req, res) => {
+  const { userId } = req.params;
 
-export { postSignUp, postLogin };
+  try {
+    const cachedData = await getCache(`user:${userId}`);
+    if (cachedData) {
+      return res.status(200).json({
+        success: true,
+        data: cachedData,
+        message: "User fetched successfully (from cache)",
+      });
+    }
+
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "User not found",
+      });
+    }
+
+    const reviews = await Review.find({ userId: userId }).sort({
+      createdAt: -1,
+    });
+
+    const data= { user, reviews };
+
+    await createCache(`user:${userId}`, data);
+
+    return res.status(200).json({
+      success: true,
+      data: data,
+      message: "User fetched successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: error?.message || "Failed to find user",
+    });
+  }
+};
+
+const putUserbyId = async (req, res) => {
+  const { userId } = req.params;
+  const { username, email } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username, email },
+      { new: true, runValidators: true, select: "-password" }
+    );
+
+    if(!updatedUser){
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "User not found"
+      });
+    };
+
+    await flushCache(`user:${userId}`);
+
+    return res.status(200).json({
+      success: true,
+      data: updatedUser,
+      message: "Profile updated successfully"
+    })
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: error?.message || "Failed to update user",
+    });
+  }
+};
+
+export { postSignUp, postLogin, getUserbyId, putUserbyId };
