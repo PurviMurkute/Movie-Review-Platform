@@ -77,11 +77,12 @@ const Home = () => {
         <h2 className="font-bold py-5 text-xl">Featured Movies</h2>
         <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
           {popularMovies.map((movie, i) => {
-            const { title, posterUrl, releaseDate, rating } = movie;
+            const { _id, title, posterUrl, releaseDate, rating } = movie;
 
             return (
               <MovieCard
                 key={i}
+                _id={_id}
                 title={title}
                 poster={posterUrl}
                 releaseDate={releaseDate}
@@ -95,11 +96,12 @@ const Home = () => {
         <h2 className="font-bold py-5 text-xl">Popular Movies</h2>
         <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
           {trendingMovies.map((movie, i) => {
-            const { title, posterUrl, releaseDate, rating } = movie;
+            const { _id, title, posterUrl, releaseDate, rating } = movie;
 
             return (
               <MovieCard
                 key={i}
+                _id={_id}
                 title={title}
                 poster={posterUrl}
                 releaseDate={releaseDate}

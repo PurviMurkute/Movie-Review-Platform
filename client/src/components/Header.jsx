@@ -4,7 +4,7 @@ import { Link } from "react-router";
 
 const Header = () => {
   return (
-    <div className="fixed top-0 left-0 w-full bg-[#011c1c] p-3 flex justify-around items-center z-10">
+    <div className="fixed top-0 left-0 w-full bg-gray-950 p-3 flex justify-around items-center z-10">
       <div>
         <h2 className="text-white font-bold text-2xl">
           <div className="flex items-center">
