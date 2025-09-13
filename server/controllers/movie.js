@@ -6,7 +6,7 @@ const getmovies = async (req, res) => {
     const { page = 1, query } = req.query;
     const API_KEY = process.env.TMDB_API_KEY;
     console.log(API_KEY);
-    
+
     let tmdbUrl;
     if (query) {
       tmdbUrl = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&page=${page}&query=${encodeURIComponent(
@@ -16,7 +16,7 @@ const getmovies = async (req, res) => {
       tmdbUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=${page}`;
     }
 
-    const cachedData = await getCache(`movies:page:${page}:query:${query || "all"}`);
+    const cachedData = await getCache(`movies`);
     if (cachedData) {
       return res.status(200).json({
         success: true,
@@ -34,12 +34,12 @@ const getmovies = async (req, res) => {
       return res.status(400).json({
         success: false,
         data: null,
-        message: "TMDB response invalid"
-      })
+        message: "TMDB response invalid",
+      });
     }
 
     const movies = data.results.map((movie) => ({
-      id: movie.id,
+      _id: movie.id,
       title: movie.title,
       posterUrl: movie.poster_path
         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
@@ -48,7 +48,7 @@ const getmovies = async (req, res) => {
       rating: movie.vote_average,
     }));
 
-    await createCache(`movies:page:${page}:query:${query || "all"}`, {
+    await createCache(`movies`, {
       page: data.page,
       totalPages: data.total_pages,
       data: movies,
@@ -61,9 +61,7 @@ const getmovies = async (req, res) => {
       data: movies,
       message: "Movies fetched successfully",
     });
-
   } catch (error) {
-    console.error(error);
     return res.status(400).json({
       success: false,
       data: null,
