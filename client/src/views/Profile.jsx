@@ -9,10 +9,14 @@ import Model from "../components/Model";
 import { MdEdit } from "react-icons/md";
 import Input from "../components/Input";
 import { UserContext } from "../context/userContext";
+import { FaRegHeart } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
+  const [watchlist, setWatchlist] = useState([]);
   const [isModelOpen, setIsModelOpen] = useState(false);
+  const [deleteMovie, setDeleteMovie] = useState({});
   const { user, setUser } = useContext(UserContext);
 
   const [username, setUsername] = useState("");
@@ -36,6 +40,22 @@ const Profile = () => {
     }
   };
 
+  const getWatchlist = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_SERVER_URL}/users/${_id}/watchlist`,
+        {
+          headers: { Authorization: `Bearer ${JWT}` },
+        }
+      );
+      if (res.data.success) {
+        setWatchlist(res.data.data);
+      }
+    } catch (e) {
+      toast.error("Failed to fetch watchlist.");
+    }
+  };
+
   const editUserProfile = async () => {
     try {
       const response = await axios.put(
@@ -45,10 +65,10 @@ const Profile = () => {
       );
 
       if (response.data.success) {
-        setUser(response.data.data.user); 
-        setProfile(response.data.data); 
+        setUser(response.data.data.user);
+        setProfile(response.data.data);
         toast.success(response.data.message);
-        setIsModelOpen(false); 
+        setIsModelOpen(false);
       } else {
         toast.error(response.data.message);
       }
@@ -57,8 +77,30 @@ const Profile = () => {
     }
   };
 
+  const removeMovieFromWatchlist = async (movieId) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_SERVER_URL}/users/${
+          user?._id
+        }/watchlist/${movieId}`,
+        {
+          headers: { Authorization: `Bearer ${JWT}` },
+        }
+      );
+
+      if (response.data.success) {
+        setWatchlist((prev) =>
+          prev.filter((movie) => movie.movieId !== movieId)
+        );
+        toast.success("Movie removed from watchlist.");
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message || e?.message);
+    }
+  };
   useEffect(() => {
     getProfile();
+    getWatchlist();
   }, [_id]);
 
   useEffect(() => {
@@ -90,60 +132,104 @@ const Profile = () => {
   return (
     <div>
       <Header />
-      <div className="max-w-4xl mx-auto px-4 py-8 mt-24">
-        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center">
+      <div className="max-w-6xl mx-auto mt-18 px-4">
+        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 text-white p-6 rounded-lg shadow-lg flex flex-col md:flex-row items-center md:items-start gap-6">
           <img
             src={userData?.profile}
             alt="profile"
-            className="w-28 h-28 rounded-full object-cover border-4 border-teal-500"
+            className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
           />
-          <h1 className="text-2xl font-bold mt-4">{userData?.username}</h1>
-          <p className="text-gray-600">{userData?.email}</p>
-          <p className="text-gray-500 text-sm">Joined on {formattedJoinDate}</p>
-          <button
-            className="flex items-center text-white bg-gray-900 px-3 py-1 rounded-full mt-3"
-            onClick={() => setIsModelOpen(true)}
-          >
-            <MdEdit className="mr-2" />
-            Edit Profile
-          </button>
-        </div>
-
-        <div className="mt-10">
-          <h2 className="text-xl font-bold mb-4">Review History</h2>
-          {reviews?.length > 0 ? (
-            <div className="space-y-4">
-              {reviews
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .map((review) => (
-                  <Link
-                    to={`/movies/${review.movieId}`}
-                    key={review._id}
-                    className="bg-gray-100 p-4 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center hover:scale-105 transition-transform duration-150"
-                  >
-                    <div>
-                      <p className="font-semibold">Movie ID: {review.movieId}</p>
-                      <p className="text-gray-700">{review.reviewText}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(review.createdAt).toLocaleDateString(
-                          "en-US",
-                          { year: "numeric", month: "short", day: "numeric" }
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1 mt-2 md:mt-0">
-                      <Star className="text-yellow-500 w-4 h-4" />
-                      <span className="font-bold">{review.rating}/5</span>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No reviews yet.</p>
-          )}
+          <div className="flex flex-col justify-center">
+            <h1 className="text-3xl font-bold mb-1">{userData?.username}</h1>
+            <p className="text-white/90">{userData?.email}</p>
+            <p className="text-sm mt-1 text-white/70">
+              Joined on {formattedJoinDate}
+            </p>
+            <button
+              className="flex items-center mt-4 bg-white text-blue-600 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition"
+              onClick={() => setIsModelOpen(true)}
+            >
+              <MdEdit className="mr-2" />
+              Edit Profile
+            </button>
+          </div>
         </div>
       </div>
 
+      <div className="max-w-6xl mx-auto px-4 mt-12">
+        <h2 className="text-2xl font-bold mb-4 border-b pb-2">
+          Review History
+        </h2>
+        {reviews?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {reviews.map((review) => (
+              <Link
+                to={`/movies/${review.movieId}`}
+                key={review._id}
+                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
+              >
+                <p className="font-semibold mb-1">Movie ID: {review.movieId}</p>
+                <p className="text-gray-700 mb-1">{review.reviewText}</p>
+                <p className="text-sm text-gray-500 mb-2">
+                  {new Date(review.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
+                <div className="flex items-center gap-1">
+                  <Star className="text-yellow-500 w-4 h-4" />
+                  <span className="font-bold">{review.rating}/5</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No reviews yet.</p>
+        )}
+      </div>
+      <div className="max-w-6xl mx-auto px-4 mt-12 mb-12">
+        <h2 className="text-2xl font-bold mb-4 border-b pb-2 flex items-center gap-2">
+          <FaRegHeart className="text-pink-500" />
+          Watchlist
+        </h2>
+        {watchlist?.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {watchlist.map((movie) => (
+              <Link
+                key={movie.movieId}
+                to={`/movies/${movie.movieId}`}
+                className="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden relative"
+              >
+                <img
+                  src={
+                    movie.posterPath
+                      ? `https://image.tmdb.org/t/p/w500${movie.posterPath}`
+                      : "https://via.placeholder.com/500x750?text=No+Image"
+                  }
+                  alt="movie"
+                  className="w-full h-64 object-cover"
+                />
+                <MdDelete
+                  className="absolute top-2 right-2 text-2xl bg-white rounded-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeMovieFromWatchlist(movie.movieId);
+                  }}
+                />
+                <div className="p-2">
+                  <p className="font-semibold truncate">
+                    {movie.title || "Movie Title"}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No movies in watchlist.</p>
+        )}
+      </div>
       <Model isOpen={isModelOpen} onClose={() => setIsModelOpen(false)}>
         <div className="flex flex-col items-center">
           <p className="text-2xl font-bold text-center py-3">Edit Profile</p>
@@ -188,6 +274,5 @@ const Profile = () => {
     </div>
   );
 };
-
 
 export default Profile;

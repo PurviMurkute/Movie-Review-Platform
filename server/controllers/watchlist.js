@@ -1,5 +1,7 @@
 import Watchlist from "../models/Watchlist.js";
 import { getCache, createCache, flushCache } from "../utils/cache.js";
+import fetch from "node-fetch";
+const API_KEY = process.env.TMDB_API_KEY;
 
 const postWatchlist = async (req, res) => {
   const userId = req.user._id;
@@ -41,9 +43,10 @@ const postWatchlist = async (req, res) => {
 
 const getWatchlistbyUser = async (req, res) => {
   const userId = req.user._id;
+  const cacheKey = `watchlist:${userId}`;
 
   try {
-    const cachedWatchlist = await getCache(`watchlist: ${userId}`);
+    const cachedWatchlist = await getCache(cacheKey);
     if (cachedWatchlist) {
       return res.status(200).json({
         success: true,
@@ -52,22 +55,38 @@ const getWatchlistbyUser = async (req, res) => {
       });
     }
 
-    const watchlist = await Watchlist.find({ userId }).populate("userId", "username profile email") 
-      .sort({ createdAt: -1 });
+    const watchlist = await Watchlist.find({ userId }).sort({ createdAt: -1 });
 
-    if (!watchlist) {
-      return res.status(404).json({
-        success: false,
-        data: null,
-        message: "Movies not added to watchlist",
+    if (!watchlist || watchlist.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No movies in watchlist",
       });
     }
 
-    await createCache(`watchlist: ${userId}`, watchlist);
+    // Fetch movie details for each movieId
+    const movieDetails = await Promise.all(
+      watchlist.map(async (item) => {
+        const tmdbUrl = `https://api.themoviedb.org/3/movie/${item.movieId}?api_key=${API_KEY}&language=en-US`;
+        const response = await fetch(tmdbUrl);
+        const data = await response.json();
+        // Return only the fields you need
+        return {
+          movieId: item.movieId,
+          title: data.title,
+          posterPath: data.poster_path,
+          releaseDate: data.release_date,
+          overview: data.overview,
+        };
+      })
+    );
+
+    await createCache(cacheKey, movieDetails);
 
     return res.status(200).json({
       success: true,
-      data: watchlist,
+      data: movieDetails,
       message: "Watchlist fetched successfully",
     });
   } catch (error) {

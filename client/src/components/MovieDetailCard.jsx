@@ -7,6 +7,7 @@ import { Link } from "react-scroll";
 import Model from "./Model";
 import { Star } from "lucide-react";
 import { UserContext } from "../context/userContext";
+import { BiMoviePlay } from "react-icons/bi";
 
 const MovieDetailCard = ({
   title,
@@ -24,6 +25,7 @@ const MovieDetailCard = ({
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [addWatchlist, setAddWatchlist] = useState({});
   const { _id } = useParams();
 
   const { user } = useContext(UserContext);
@@ -59,7 +61,7 @@ const MovieDetailCard = ({
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to post review");
-    } 
+    }
   };
 
   const getReviews = async () => {
@@ -72,6 +74,29 @@ const MovieDetailCard = ({
       if (response.data.success) {
         setMovieReviews(response.data.data);
         console.log(response.data);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message || e?.message);
+    }
+  };
+
+  const addToWatchlist = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/users/${_id}/watchlist`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${JWT}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setAddWatchlist(response.data.data);
+        toast.success(response.data.message);
       } else {
         toast.error(response.data.message);
       }
@@ -108,12 +133,21 @@ const MovieDetailCard = ({
             <p className="italic text-gray-300 text-md">
               Directed by: {director}
             </p>
-            <Link to="trailer" smooth={true} duration={400}>
-              <button className="bg-black text-white px-5 py-2 flex items-center rounded-full cursor-pointer hover:scale-95 transition-transform duration-150">
-                <RiMovieLine className="inline mr-2 text-lg" />
-                <span className="text-md">Watch Trailer</span>{" "}
+            <div className="flex flex-col md:flex-row md:items-center gap-3 my-3">
+              <button
+                className="bg-white text-black px-3 py-2 flex items-center rounded-full cursor-pointer hover:scale-95 transition-transform duration-150"
+                onClick={addToWatchlist}
+              >
+                <BiMoviePlay className="inline mr-2 text-lg" />
+                <span className="text-sm">Add to Watchlist</span>{" "}
               </button>
-            </Link>
+              <Link to="trailer" smooth={true} duration={400}>
+                <button className="bg-black text-white px-5 py-2 flex items-center rounded-full cursor-pointer hover:scale-95 transition-transform duration-150">
+                  <RiMovieLine className="inline mr-2 text-lg" />
+                  <span className="text-md">Watch Trailer</span>{" "}
+                </button>
+              </Link>
+            </div>
             <p className="text-xl font-medium">Overview</p>
             <p className="max-w-2xl text-sm md:text-base text-gray-200">
               {overview}
@@ -157,13 +191,17 @@ const MovieDetailCard = ({
         <h2 className="text-xl font-bold mb-4 text-black p-2">Reviews</h2>
 
         <div className="flex justify-end my-5">
-        <button
-          onClick={() => setIsOpen(true)}
-          className={`${user? "bg-teal-600 cursor-pointer hover:bg-teal-700 transition": " bg-gray-400 cursor-not-allowed"} px-5 py-2 text-white rounded-full shadow-md`}
-        >
-          Write a Review
-        </button>
-      </div>
+          <button
+            onClick={() => setIsOpen(true)}
+            className={`${
+              user
+                ? "bg-teal-600 cursor-pointer hover:bg-teal-700 transition"
+                : " bg-gray-400 cursor-not-allowed"
+            } px-5 py-2 text-white rounded-full shadow-md`}
+          >
+            Write a Review
+          </button>
+        </div>
 
         {movieReviews.length > 0 ? (
           <div className="space-y-4">
@@ -253,7 +291,8 @@ const MovieDetailCard = ({
           <button
             onClick={handleSubmit}
             className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
-          >Submit
+          >
+            Submit
           </button>
         </div>
       </Model>
