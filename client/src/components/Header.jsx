@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { RiMovie2Line } from "react-icons/ri";
 import { Link, useNavigate } from "react-router";
-import { UserContext } from "../context/userContext";
+import { UserContext } from "../context/UserContext";
 import toast, { Toaster } from "react-hot-toast";
 
 const Header = () => {

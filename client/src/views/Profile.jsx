@@ -8,7 +8,7 @@ import { Star } from "lucide-react";
 import Model from "../components/Model";
 import { MdEdit } from "react-icons/md";
 import Input from "../components/Input";
-import { UserContext } from "../context/userContext";
+import { UserContext } from "../context/UserContext";
 import { FaRegHeart } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 

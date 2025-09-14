@@ -6,7 +6,7 @@ import { useParams } from "react-router";
 import { Link } from "react-scroll";
 import Model from "./Model";
 import { Star } from "lucide-react";
-import { UserContext } from "../context/userContext";
+import { UserContext } from "../context/UserContext";
 import { BiMoviePlay } from "react-icons/bi";
 
 const MovieDetailCard = ({
