@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { getCache, createCache, flushCache } from "../utils/cache.js";
+import { getCache, createCache } from "../utils/cache.js";
 
 const API_KEY = process.env.TMDB_API_KEY;
 console.log(API_KEY);
@@ -68,7 +68,7 @@ const gettrendingmovies = async (req, res) => {
   try {
     const { page = 1 } = req.query;
 
-    let trendingMovieUrl= `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&page=${page}`;
+    let trendingMovieUrl = `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&page=${page}`;
 
     const cachedData = await getCache(`trendingmovies`);
     if (cachedData) {
@@ -127,14 +127,17 @@ const gettrendingmovies = async (req, res) => {
 const movieSearch = async (req, res) => {
   const { query, genre, rating, page = 1 } = req.query;
 
-  if (!query || query.trim() === '') {
-    return res.status(400).json({ message: 'Search query is required.' });
+  if (!query || query.trim() === "") {
+    return res
+      .status(400)
+      .json({ success: false, message: "Search query is required." });
   }
 
   try {
-    const tmdbUrl = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&page=${page}&query=${encodeURIComponent(query)}`;
-
-    const cachedData = await getCache(`movies`);
+    const cacheKey = `movies:${query}:${genre || "all"}:${
+      rating || "all"
+    }:page:${page}`;
+    const cachedData = await getCache(cacheKey);
     if (cachedData) {
       return res.status(200).json({
         success: true,
@@ -143,34 +146,46 @@ const movieSearch = async (req, res) => {
       });
     }
 
+    const tmdbUrl = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&page=${page}&query=${encodeURIComponent(
+      query
+    )}`;
     const response = await fetch(tmdbUrl);
-    let movies = await response.json();
+    const data = await response.json();
+
+    if (!data?.results) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No movies found." });
+    }
+
+    let movies = data.results;
 
     if (genre) {
-      movies = movies.filter(movie =>
-        movie.genre_ids.includes(parseInt(genre))
-      );
+      const genreId = parseInt(genre);
+      movies = movies.filter((movie) => movie.genre_ids.includes(genreId));
     }
 
     if (rating) {
-      movies = movies.filter(movie =>
-        movie.vote_average >= parseFloat(rating)
-      );
+      const minRating = parseFloat(rating);
+      movies = movies.filter((movie) => movie.vote_average >= minRating);
     }
 
-    await createCache(`movies`, movies);
+    await createCache(cacheKey, movies);
 
-    res.status(200).json({ 
+    res.status(200).json({
       success: true,
       data: movies,
-      message: "Movies fetched successfully"
-     });
-
+      message: "Movies fetched successfully",
+    });
   } catch (err) {
-    console.error('TMDB API Error:', err.message);
-    res.status(500).json({ message: 'Failed to fetch movies.' });
+    console.error("TMDB API Error:", err.message);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch movies." });
   }
-}
+};
+
+export default movieSearch;
 
 const getMoviebyId = async (req, res) => {
   const { movieId } = req.params;
@@ -246,6 +261,5 @@ const getMoviebyId = async (req, res) => {
     });
   }
 };
-
 
 export { getpopularmovies, gettrendingmovies, movieSearch, getMoviebyId };

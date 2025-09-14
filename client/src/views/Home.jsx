@@ -5,13 +5,16 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import MovieCard from "../components/MovieCard";
 import Footer from "../components/Footer";
+import Loader from "../components/Loader";
 
 const Home = () => {
   const [popularMovies, setPopularMovies] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getPopularMovies = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `${import.meta.env.VITE_SERVER_URL}/popular/movies`
       );
@@ -23,11 +26,14 @@ const Home = () => {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || error?.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const getTrendingMovies = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `${import.meta.env.VITE_SERVER_URL}/trending/movies`
       );
@@ -39,6 +45,8 @@ const Home = () => {
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || error?.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,41 +84,49 @@ const Home = () => {
       </div>
       <div className="mx-5 md:mx-20 my-5">
         <h2 className="font-bold py-5 text-xl">Featured Movies</h2>
-        <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
-          {popularMovies.map((movie, i) => {
-            const { _id, title, posterUrl, releaseDate, rating } = movie;
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
+            {popularMovies.map((movie, i) => {
+              const { _id, title, posterUrl, releaseDate, rating } = movie;
 
-            return (
-              <MovieCard
-                key={i}
-                _id={_id}
-                title={title}
-                poster={posterUrl}
-                releaseDate={releaseDate}
-                rating={rating}
-              />
-            );
-          })}
-        </div>
+              return (
+                <MovieCard
+                  key={i}
+                  _id={_id}
+                  title={title}
+                  poster={posterUrl}
+                  releaseDate={releaseDate}
+                  rating={rating}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
       <div className="mx-5 md:mx-20 my-10">
         <h2 className="font-bold py-5 text-xl">Popular Movies</h2>
-        <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
-          {trendingMovies.map((movie, i) => {
-            const { _id, title, posterUrl, releaseDate, rating } = movie;
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
+            {trendingMovies.map((movie, i) => {
+              const { _id, title, posterUrl, releaseDate, rating } = movie;
 
-            return (
-              <MovieCard
-                key={i}
-                _id={_id}
-                title={title}
-                poster={posterUrl}
-                releaseDate={releaseDate}
-                rating={rating}
-              />
-            );
-          })}
-        </div>
+              return (
+                <MovieCard
+                  key={i}
+                  _id={_id}
+                  title={title}
+                  poster={posterUrl}
+                  releaseDate={releaseDate}
+                  rating={rating}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
       <Toaster />
       <Footer />

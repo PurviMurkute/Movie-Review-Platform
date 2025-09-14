@@ -84,7 +84,7 @@ const Header = () => {
               <img
                 src={user.profile}
                 alt="profile"
-                className="w-10 h-10 object-cover rounded-full border-2 border-teal-400 hover:scale-105 transition"
+                className="w-10 h-10 object-cover rounded-full border-2 cursor-pointer border-teal-400 hover:scale-105 transition"
                 onClick={handleImageClick}
               />
             </>

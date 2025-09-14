@@ -16,7 +16,6 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
   const [isModelOpen, setIsModelOpen] = useState(false);
-  const [deleteMovie, setDeleteMovie] = useState({});
   const { user, setUser } = useContext(UserContext);
 
   const [username, setUsername] = useState("");
@@ -146,7 +145,7 @@ const Profile = () => {
               Joined on {formattedJoinDate}
             </p>
             <button
-              className="flex items-center mt-4 bg-white text-blue-600 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition"
+              className="flex items-center mt-4 bg-white text-blue-600 px-4 py-2 rounded-full cursor-pointer font-semibold hover:bg-gray-100 transition"
               onClick={() => setIsModelOpen(true)}
             >
               <MdEdit className="mr-2" />

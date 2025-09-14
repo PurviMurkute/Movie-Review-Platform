@@ -190,7 +190,7 @@ const MovieDetailCard = ({
       <div className="px-4 md:px-15 my-10">
         <h2 className="text-xl font-bold mb-4 text-black p-2">Reviews</h2>
 
-        <div className="flex justify-end my-5">
+        <div className="flex justify-end my-5 ">
           <button
             onClick={() => setIsOpen(true)}
             className={`${
@@ -204,7 +204,7 @@ const MovieDetailCard = ({
         </div>
 
         {movieReviews.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-4 h-[350px] overflow-y-auto whitespace-nowrap scrollbar-hide">
             {movieReviews
               .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
               .map((review) => (
@@ -238,7 +238,9 @@ const MovieDetailCard = ({
               ))}
           </div>
         ) : (
-          <p className="text-gray-500">No reviews yet.</p>
+          <div className="flex justify-center items-center my-20">
+          <p className="text-gray-800 text-2xl">No reviews yet.</p>
+          </div>
         )}
       </div>
 
