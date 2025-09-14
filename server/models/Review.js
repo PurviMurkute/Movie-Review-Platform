@@ -8,7 +8,7 @@ const reviewSchema = new Schema(
       required: true,
     },
     movieId: {
-      type: Number,
+      type: String,
       required: true,
     },
     rating: {

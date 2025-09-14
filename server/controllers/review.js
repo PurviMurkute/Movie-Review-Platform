@@ -55,9 +55,9 @@ const getReviewsByMovie = async (req, res) => {
       });
     }
 
-    const reviews = await Review.find({ movieId: movieId }).sort({
-      createdAt: -1,
-    });
+    const reviews = await Review.find({ movieId })
+      .populate("userId", "username profile email") 
+      .sort({ createdAt: -1 });
 
     if (!reviews) {
       return res.status(404).json({

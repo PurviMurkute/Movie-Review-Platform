@@ -24,7 +24,7 @@ const Input = ({ type, placeholder, value, onChange, passwordInput, showPass, se
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`w-[90%] md:w-[85%] bg-gray-200 p-2 my-5 shadow-lg block mx-auto rounded-md focus:outline-none `}
+        className={`w-[90%] md:w-[85%] bg-white p-2 my-5 shadow-lg block mx-auto rounded-md focus:outline-none `}
       />
     </div>
   );

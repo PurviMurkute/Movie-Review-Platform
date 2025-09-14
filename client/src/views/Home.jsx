@@ -74,7 +74,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="mx-20 my-5">
+      <div className="mx-5 md:mx-20 my-5">
         <h2 className="font-bold py-5 text-xl">Featured Movies</h2>
         <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
           {popularMovies.map((movie, i) => {
@@ -93,7 +93,7 @@ const Home = () => {
           })}
         </div>
       </div>
-      <div className="mx-20 my-10">
+      <div className="mx-5 md:mx-20 my-10">
         <h2 className="font-bold py-5 text-xl">Popular Movies</h2>
         <div className="flex gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
           {trendingMovies.map((movie, i) => {

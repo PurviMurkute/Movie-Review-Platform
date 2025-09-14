@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import { FaSignInAlt } from "react-icons/fa";
 import Input from "../components/Input";
 import { UserContext } from "../context/userContext";
+import Footer from "../components/Footer";
 
 const Login = () => {
   const [loginUser, setLoginUser] = useState({
@@ -52,11 +53,12 @@ const Login = () => {
   };
 
   return (
+    <>
     <div className="min-h-screen top-0 left-0 fixed w-full flex justify-center items-center">
       <Header />
-        <div className="ms-1 md:me-5 bg-gray-200 p-10 rounded-md">
+        <div className="ms-1 md:me-5 bg-gradient-to-b from-red-600 via-orange-500 to-red-500 px-5 py-10 rounded-md">
           <form
-            className="w-[300px] md:w-[420px] block mx-auto bg-gradient-to-b from-gray-700 via-gray-900 to-black py-5 px-2 shadow-xl my-2 rounded-md relative"
+            className="w-[300px] md:w-[420px] block mx-auto py-5 px-2 my-2 rounded-md relative"
             onSubmit={(e) => {
               e.preventDefault();
             }}
@@ -84,17 +86,18 @@ const Login = () => {
               showPass={showPass}
               setShowPass={setShowPass}
             />
-            <button className="bg-gray-100 w-[85%] py-2 text-black rounded-2xl block mx-auto my-6 cursor-pointer" onClick={userLogin}>Login</button>
+            <button className="bg-white w-[85%] py-2 text-black rounded-2xl block mx-auto my-6 cursor-pointer" onClick={userLogin}>Login</button>
           </form>
-          <p className="text-slate-800 text-center font-medium py-2">
+          <p className="text-white text-center font-medium py-2">
             Dont have an account?{" "}
-            <Link to="/signup" className="text-blue-700">
+            <Link to="/signup" className="text-blue-400">
               SignUp now.
             </Link>
           </p>
         </div>
       <Toaster />
     </div>
+    </>
   );
 };
 

@@ -50,9 +50,9 @@ const Signup = () => {
   return (
     <div className="min-h-screen top-0 left-0 fixed w-full flex justify-center items-center">
       <Header />
-      <div className="ms-1 md:me-5 bg-gray-200 p-10 rounded-md">
+      <div className="ms-1 md:me-5 bg-gradient-to-b from-red-600 via-orange-500 to-red-500 px-5 py-10 rounded-md">
         <form
-          className="w-[300px] md:w-[420px] block mx-auto bg-gradient-to-b from-gray-700 via-gray-900 to-black py-5 px-2 shadow-xl my-2 rounded-md relative"
+          className="w-[300px] md:w-[420px] block mx-auto py-5 px-2 my-2 rounded-md relative"
           onSubmit={(e) => {
             e.preventDefault();
           }}
@@ -95,9 +95,9 @@ const Signup = () => {
             Signup
           </button>
         </form>
-        <p className="text-slate-800 text-center font-medium py-2">
+        <p className="text-white text-center font-medium py-2">
           Already have an account?{" "}
-          <Link to="/login" className="text-blue-700">
+          <Link to="/login" className="text-blue-400">
             Login now.
           </Link>
         </p>
