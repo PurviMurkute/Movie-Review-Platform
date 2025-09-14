@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams } from "react-router";
 import toast, { Toaster } from "react-hot-toast";
 import MovieDetailCard from "../components/MovieDetailCard";
+import Footer from "../components/Footer";
 
 const MovieInfo = () => {
   const [movieDetails, setMovieDetails] = useState({});
@@ -47,6 +48,7 @@ const MovieInfo = () => {
         )}
       </div>
       <Toaster />
+      <Footer />
     </div>
   );
 };

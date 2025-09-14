@@ -1,6 +1,18 @@
-import React from 'react'
+import React from "react";
+import { RiMovieLine } from "react-icons/ri";
+import { Link } from "react-scroll";
 
-const MovieDetailCard = ({ title, releaseDate, poster, backdrop, genre, overview, director, cast, trailer }) => {
+const MovieDetailCard = ({
+  title,
+  releaseDate,
+  poster,
+  backdrop,
+  genre,
+  overview,
+  director,
+  cast,
+  trailer,
+}) => {
   return (
     <div className="text-white">
       <div className="relative w-full h-[600px]">
@@ -17,12 +29,22 @@ const MovieDetailCard = ({ title, releaseDate, poster, backdrop, genre, overview
             className="w-[300px] h-full rounded-xl shadow-lg object-cover block"
           />
           <div className="ml-6 space-y-4">
-            <h1 className="text-5xl font-bold">{title} ({new Date(releaseDate)?.getFullYear()})</h1>
+            <h1 className="text-5xl font-bold">
+              {title} ({new Date(releaseDate)?.getFullYear()})
+            </h1>
             <p className="text-gray-300 text-md">
               {releaseDate} • {genre?.join(", ")}
             </p>
-            <p className="italic text-gray-300 text-md">Directed by: {director}</p>
-            <p className='text-xl font-medium'>Overview</p>
+            <p className="italic text-gray-300 text-md">
+              Directed by: {director}
+            </p>
+            <Link to="trailer" smooth={true} duration={400}>
+              <button className="bg-black text-white px-5 py-2 flex items-center rounded-full cursor-pointer hover:scale-95 transition-transform duration-150">
+                <RiMovieLine className="inline mr-2 text-lg" />
+                <span className="text-md">Watch Trailer</span>{" "}
+              </button>
+            </Link>
+            <p className="text-xl font-medium">Overview</p>
             <p className="max-w-2xl text-sm md:text-base text-gray-200">
               {overview}
             </p>
@@ -30,50 +52,51 @@ const MovieDetailCard = ({ title, releaseDate, poster, backdrop, genre, overview
         </div>
       </div>
       <div className="px-4 md:px-12 my-10">
-      <h2 className="text-xl font-bold mb-4">Top Billed Cast</h2>
-      <div className="flex gap-4 overflow-x-auto scrollbar-hide">
-        {cast?.map((actor, index) => {
-          const { name, character, profile } = actor;
-          return (
-            <div
-              key={index}
-              className="w-[140px] bg-white rounded-lg shadow-md overflow-hidden flex-shrink-0"
-            >
-              <img
-                src={
-                  profile
-                    ? `https://image.tmdb.org/t/p/w300${profile}`
-                    : "/fallback-profile.png"
-                }
-                alt={name}
-                className="w-full h-[180px] object-cover"
-              />
-              <div className="p-2">
-                <p className="text-sm font-bold text-gray-900 truncate">
-                  {name}
-                </p>
-                <p className="text-xs text-gray-500 truncate">{character}</p>
+        <h2 className="text-xl font-bold mb-4 text-black p-2">
+          Top Billed Cast
+        </h2>
+        <div className="flex gap-4 overflow-x-auto scrollbar-hide">
+          {cast?.map((actor, index) => {
+            const { name, character, profile } = actor;
+            return (
+              <div
+                key={index}
+                className="w-[140px] bg-white rounded-lg shadow-md overflow-hidden flex-shrink-0"
+              >
+                <img
+                  src={
+                    profile
+                      ? `https://image.tmdb.org/t/p/w300${profile}`
+                      : "/fallback-profile.png"
+                  }
+                  alt={name}
+                  className="w-full h-[180px] object-cover"
+                />
+                <div className="p-2">
+                  <p className="text-sm font-bold text-gray-900 truncate">
+                    {name}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">{character}</p>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
       {trailer && (
-        <div className="my-6 flex justify-center">
+        <div name="trailer" className="my-6 flex justify-center">
           <iframe
             width="80%"
             height="400"
             src={trailer}
             title="Movie Trailer"
-            frameBorder="0"
             allowFullScreen
             className="rounded-xl shadow-lg"
           ></iframe>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MovieDetailCard
+export default MovieDetailCard;

@@ -4,6 +4,7 @@ import moviebg from "../assets/moviebg.jpg";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import MovieCard from "../components/MovieCard";
+import Footer from "../components/Footer";
 
 const Home = () => {
   const [popularMovies, setPopularMovies] = useState([]);
@@ -112,6 +113,7 @@ const Home = () => {
         </div>
       </div>
       <Toaster />
+      <Footer />
     </div>
   );
 };
