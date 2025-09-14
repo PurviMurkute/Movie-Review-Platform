@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { ConnectToDB } from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import movieRouter from "./routes/movieRoute.js";
+import watchlistRouter from "./routes/watchlistRoute.js";
 dotenv.config();
 
 
@@ -23,6 +24,7 @@ app.get("/health", (req, res) => {
 
 app.use('/api', authRouter);
 app.use('/api', movieRouter);
+app.use('/api', watchlistRouter);
 
 ConnectToDB();
 app.listen(PORT, () => {
